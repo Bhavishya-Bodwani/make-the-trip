@@ -10,11 +10,11 @@ router.post('/login',async (req,res)=>{
     try{
         const foundUser=await user.findOne({email})
         if(!foundUser){
-        res.status(400).json({msg:"Invalid email and password"}) 
+        res.status(500).json({msg:"Invalid email and password"}) 
         }else{
         let isCorrect = await bcrypt.compare(password,foundUser.password)
         if(!isCorrect){
-            res.status(400).json({msg:"Invalid email and password"})
+            res.status(500).json({msg:"Invalid email and password"})
         }else{
             res.status(200).json({msg:"Login Successfully"})
         }
@@ -35,10 +35,14 @@ router.post('/signup',async (req,res)=>{
         password:hash
         });
         await userr.save();
-        res.json("you have succesfully destructured and stored the data ")
+        res.status(200).json({msg:"you have succesfully destructured and stored the data "})
     }catch(error){
         console.log(error)
-        res.status(500).json({error:"there is some error in the email"})
+        if(error.name==="ValidationError"){
+            res.status(500).json({error:"There is some issue please enter all the details correctly!"})
+        }else{
+            res.status(500).json({error:"Internal Server error"})
+        }
     }
 })
 
