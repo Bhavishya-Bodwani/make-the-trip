@@ -3,6 +3,7 @@ const app=express();
 const port=8090;
 const auth= require("./routes/auth") 
 const mongoose = require('mongoose');
+const dotenv= require('dotenv').config();
 main()
 .then(()=>{
     console.log("Connection is Successfull")
