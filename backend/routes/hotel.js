@@ -24,4 +24,14 @@ router.post("/",authMiddleware,async(req,res)=>{
     }
 });
 
+router.get("/",async(req,res)=>{
+    try{
+        const collection = await hotel.find({});
+        res.status(200).json({message:"user can see the listings available in Db",list:collection});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message:"Can not find the listing !"});
+    }
+})
+
 module.exports=router;
