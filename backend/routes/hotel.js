@@ -62,5 +62,18 @@ router.put("/:id",authMiddleware,async(req,res)=>{
     }
 })
 
+router.delete("/:id",authMiddleware,async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const deleted= await hotel.findByIdAndDelete(id);
 
+        if(deleted===null){
+            return res.status(404).json({message:"Listing does not exist",list:deleted})
+        }
+        res.status(200).json({message:"The Listing has been deleted successfully",list:deleted});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message:"Cannot delete the listing"});
+    }
+})
 module.exports=router;
