@@ -49,4 +49,18 @@ router.get("/:id",async(req,res)=>{
     }
 })
 
+router.put("/:id",authMiddleware,async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const {name,location,price,amenities,images,rating}=req.body;
+        const collection= await hotel.findByIdAndUpdate(id,{name,location,price,amenities,images,rating},{new:true});
+
+        res.status(200).json({message:"Listing has been updated successfully",list:collection});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message:"Cannot modify the listing details !"});
+    }
+})
+
+
 module.exports=router;
