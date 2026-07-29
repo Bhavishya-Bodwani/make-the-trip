@@ -55,6 +55,9 @@ router.put("/:id",authMiddleware,async(req,res)=>{
         const {name,location,price,amenities,images,rating}=req.body;
         const collection= await hotel.findByIdAndUpdate(id,{name,location,price,amenities,images,rating},{new:true});
 
+        if(collection==null){
+           return res.status(404).json({message:"can not find the listing!"}); // return i have initialized because if not then code will keep executing itself
+        }
         res.status(200).json({message:"Listing has been updated successfully",list:collection});
     }catch(error){
         console.log(error);
