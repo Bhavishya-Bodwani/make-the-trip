@@ -3,6 +3,7 @@ const app=express();
 const port=8090;
 const auth= require("./routes/auth") 
 const hotels=require("./routes/hotel");
+const flight=require("./routes/flight");
 const mongoose = require('mongoose');
 const dotenv= require('dotenv').config();
 main()
@@ -25,6 +26,7 @@ app.get("/",(req,res)=>{
 
 app.use("/auth",auth);
 app.use("/hotels",hotels);
+app.use("/flight",flight);
 app.listen(port,()=>{
     console.log(`app is litening on port: ${port}`)
 })
