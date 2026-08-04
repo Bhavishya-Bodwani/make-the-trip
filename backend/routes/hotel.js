@@ -26,8 +26,11 @@ router.post("/",authMiddleware,async(req,res)=>{
 
 router.get("/",async(req,res)=>{
     try{
-        const collection = await hotel.find({});
-        res.status(200).json({message:"user can see the listings available in Db",list:collection});
+        const {locationSearched}=req.query;
+        const filter=locationSearched ? {location:locationSearched}:{};
+        const returnSearch= await hotel.find(filter);
+        
+        res.status(200).json({message:"user can see the listings available in Db",list:returnSearch});
     }catch(error){
         console.log(error);
         res.status(500).json({message:"Can not find the listing !"});
@@ -38,7 +41,7 @@ router.get("/:id",async(req,res)=>{
     try{
         const {id}=req.params;
         const collection = await hotel.findById(id);
-        
+
         if(collection==null){
            return res.status(404).json({message:"can not find the listing!"}); // return i have initialized because if not then code will keep executing itself
         }
