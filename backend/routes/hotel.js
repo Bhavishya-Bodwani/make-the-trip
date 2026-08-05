@@ -27,9 +27,19 @@ router.post("/",authMiddleware,async(req,res)=>{
 router.get("/",async(req,res)=>{
     try{
         const {locationSearched}=req.query;
+        const {minPrice,maxPrice}=req.query;
         const filter=locationSearched ? {location:locationSearched}:{};
-        const returnSearch= await hotel.find(filter);
-        
+        const pricefilter={};
+        if(minPrice){
+            pricefilter.$gte=Number(minPrice)
+        }
+        if(maxPrice){
+            pricefilter.$lte=Number(maxPrice)   
+        }
+        const filterPrice=Object.keys(pricefilter).length?{price:pricefilter}:{};
+        const combined={...filter,...filterPrice}
+        const returnSearch= await hotel.find(combined);
+
         res.status(200).json({message:"user can see the listings available in Db",list:returnSearch});
     }catch(error){
         console.log(error);
