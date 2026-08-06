@@ -30,7 +30,28 @@ router.post("/",authMiddleware,async(req,res)=>{
 
 router.get("/",async(req,res)=>{
     try{
-        const flightStatus= await flight.find({});
+        const {from,to,airline}=req.query;
+        const filter={};
+        if(from){
+            filter.from=from;
+        }
+        if(to){
+            filter.to=to;
+        }
+        if(airline){
+            filter.airline=airline;
+        }
+        const {minPrice,maxPrice}=req.query;
+        const filterPrice={};
+        if(minPrice){
+            filterPrice.$gte=Number(minPrice);
+        }
+        if(maxPrice){
+            filterPrice.$lte=Number(maxPrice);
+        }
+        const priceFilter=Object.keys(filterPrice).length?{price:filterPrice}:{};
+        const combined={...filter,...priceFilter};
+        const flightStatus= await flight.find(combined);
         res.status(200).json({message:"all the listings is available!",flights:flightStatus});
     }catch(error){
         console.log(error);
