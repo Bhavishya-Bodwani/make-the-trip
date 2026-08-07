@@ -28,6 +28,18 @@ router.post("/",authMiddleware,async(req,res)=>{
     }
 });
 
+router.get("/profile",authMiddleware,async(req,res)=>{
+        try{    
+            const bookedListingProfile= await booking.find({userId:req.userId});
+            if(bookedListingProfile.length===0){
+               return res.status(404).json({message:"There is an error finding the booking"})
+            }
+            res.status(200).json({message:"Your bookings are here :",profile:bookedListingProfile});
+        }catch(error){
+            res.status(400).json({message:"There is an error finding the bookings !"});
+        }
+    })
+
 router.get("/:id",authMiddleware,async(req,res)=>{
     try{
         const {id}=req.params;
