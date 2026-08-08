@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt= require("jsonwebtoken");
 const user= require("../models/user");
 const auth= require("../middleware/auth");
+const {body,validationResult}= require("express-validator");
 
 router.post('/login',async (req,res)=>{
     const email= req.body.email
@@ -28,7 +29,16 @@ router.post('/login',async (req,res)=>{
     }
 })
 
-router.post('/signup',async (req,res)=>{
+router.post('/signup',[
+    body('email').notEmpty().isEmail().withMessage('Invaild email'),
+    body('password').notEmpty().isStrongPassword().withMessage('the password should be of min 8 chars with one Uppercase and Lowercase letter'),
+    body('name').notEmpty().isAlpha().withMessage("The name should not contain any number or symbols"),
+],async (req,res)=>{
+    const errors=validationResult(req);
+    if(!errors.isEmpty()){
+       return res.status(400).json({errors:errors.array()});
+    }
+
     const {name,email,password} = req.body // destructuring done 
     try{
         const hash = await bcrypt.hash(password,10);
@@ -37,6 +47,7 @@ router.post('/signup',async (req,res)=>{
         email:email,
         password:hash
         });
+
         await userr.save();
         res.status(200).json({msg:"you have succesfully destructured and stored the data "})
     }catch(error){
