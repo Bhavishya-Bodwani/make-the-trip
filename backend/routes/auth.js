@@ -6,7 +6,15 @@ const user= require("../models/user");
 const auth= require("../middleware/auth");
 const {body,validationResult}= require("express-validator");
 
-router.post('/login',async (req,res)=>{
+router.post('/login',[
+    body('email').notEmpty().isEmail().withMessage('Invaild email'),
+    body('password').notEmpty().isStrongPassword().withMessage('the password should be of min 8 chars with one Uppercase and Lowercase letter'),
+],async (req,res)=>{
+    const errors=validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors:errors.array()});
+    }
+
     const email= req.body.email
     const password= req.body.password
 
