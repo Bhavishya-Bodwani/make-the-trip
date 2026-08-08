@@ -3,7 +3,7 @@ const router=express.Router();
 const review=require("../models/review");
 const authMiddleware=require("../middleware/auth");
 
-router.post("/",authMiddleware,async(req,res)=>{
+router.post("/",authMiddleware,async(req,res,next)=>{
     try{
         const {userId,hotelId,rating,reviews}=req.body;
 
@@ -17,12 +17,11 @@ router.post("/",authMiddleware,async(req,res)=>{
         await reviewListing.save();
         res.status(201).json({message:"review Listing is added",listing:reviewListing});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"there is an error in reviewListing"});
+        next(error);
     }
 });
 
-router.get("/",async(req,res)=>{
+router.get("/",async(req,res,next)=>{
     try{
         const reviewListing=await review.find({});
         if(reviewListing==null){
@@ -30,13 +29,11 @@ router.get("/",async(req,res)=>{
         }
         res.status(200).json({message:"Here are all the reviews/ratings",listing:reviewListing});
     }catch(error){
-        console.log(error);
-
-        res.status(500).json({message:"There is an error finding the listing"});
+        next(error);
     }
 })
 
-router.put("/:id",authMiddleware,async(req,res)=>{
+router.put("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {userId,hotelId,rating,reviews}= req.body //without destructuring you can not use it for the findby id and update in the args;
         const {id}=req.params;
@@ -48,11 +45,11 @@ router.put("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Your review has been successfully updated",listing:reviewListing});
     }catch(error){
-        res.status(500).json({message:"There is an error updating the listing"});
+      next(error);
     }
 });
 
-router.delete("/:id",authMiddleware,async(req,res)=>{
+router.delete("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id} = req.params;
 
@@ -63,8 +60,7 @@ router.delete("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Your listing has been successfully deleted !"});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"There is an error deleting the Listing"});
+       next(error);
     }
 });
 

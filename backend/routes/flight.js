@@ -3,7 +3,7 @@ const router=express.Router();
 const flight=require("../models/flight");
 const authMiddleware=require("../middleware/auth");
 
-router.post("/",authMiddleware,async(req,res)=>{
+router.post("/",authMiddleware,async(req,res,next)=>{
     try{
         const {flightNumber,airline,from,to,departureTime,arrivalTime,price,seats,type,returnDate}=req.body;
 
@@ -23,12 +23,11 @@ router.post("/",authMiddleware,async(req,res)=>{
         await flightInfo.save();
         res.status(200).json({message:"your search related flights are here !",flight:flightInfo});
     }catch(error){
-        console.log(error);
-        res.status(400).json({message:"There is a error in the request"});
+        next(error);
     }
 });
 
-router.get("/",async(req,res)=>{
+router.get("/",async(req,res,next)=>{
     try{
         const {from,to,airline}=req.query;
         const filter={};
@@ -54,12 +53,11 @@ router.get("/",async(req,res)=>{
         const flightStatus= await flight.find(combined);
         res.status(200).json({message:"all the listings is available!",flights:flightStatus});
     }catch(error){
-        console.log(error);
-        res.status(400).json({message:"there is some error Listing is not available!"});
+        next(error);
     } 
 });
 
-router.get("/:id",async(req,res)=>{
+router.get("/:id",async(req,res,next)=>{
     try{
         const {id}=req.params;
         const flightStatus=await flight.findById(id);
@@ -69,12 +67,11 @@ router.get("/:id",async(req,res)=>{
         }
         res.status(200).json({message:"your flight info is here !",flight:flightStatus});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"There is an error exist !"})
+        next(error)
     }
 })
 
-router.put("/:id",authMiddleware,async(req,res)=>{
+router.put("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id}=req.params;
         const {flightNumber,airline,from,to,departureTime,arrivalTime,price,seats,type,returnDate}=req.body;
@@ -85,12 +82,11 @@ router.put("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Your Listing has been successfully updated",flight:flightStatus_update});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"Internal server error occured"})
+       next(error);
     }
 });
 
-router.delete("/:id",authMiddleware,async(req,res)=>{
+router.delete("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id}=req.params;
         const flightStatus_delete= await flight.findByIdAndDelete(id);
@@ -100,8 +96,7 @@ router.delete("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Your Listing has been successfully deleted",flight:flightStatus_delete});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"there is an error deleting the listing"});
+       next(error)
     }
 })
 

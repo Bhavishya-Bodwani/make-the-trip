@@ -31,6 +31,11 @@ app.use("/hotels",hotels);
 app.use("/flight",flight);
 app.use("/booking",booking);
 app.use("/review",review);
+
+app.use((err,req,res,next)=>{
+    console.error(err.stack);
+    res.status(500).json({error:err.message});
+})
 app.listen(port,()=>{
     console.log(`app is litening on port: ${port}`)
 })

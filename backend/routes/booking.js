@@ -3,7 +3,7 @@ const router=express.Router();
 const booking=require("../models/booking")
 const authMiddleware=require("../middleware/auth");
 
-router.post("/",authMiddleware,async(req,res)=>{
+router.post("/",authMiddleware,async(req,res,next)=>{
     try{
         const {name,userId,hotelId,from,to,people,paymentType,finalPrice,email,phoneNo}=req.body; //destructured
 
@@ -23,12 +23,11 @@ router.post("/",authMiddleware,async(req,res)=>{
         await bookedListings.save()
         res.status(201).json({message:"Booking has been confirmed successfully!",data:bookedListings});
     }catch(error){
-        console.log(error);
-        res.status(400).json({message:"some error is there"});
+        next(error);
     }
 });
 
-router.get("/profile",authMiddleware,async(req,res)=>{
+router.get("/profile",authMiddleware,async(req,res,next)=>{
         try{    
             const bookedListingProfile= await booking.find({userId:req.userId});
             if(bookedListingProfile.length===0){
@@ -36,11 +35,11 @@ router.get("/profile",authMiddleware,async(req,res)=>{
             }
             res.status(200).json({message:"Your bookings are here :",profile:bookedListingProfile});
         }catch(error){
-            res.status(400).json({message:"There is an error finding the bookings !"});
+           next(error);
         }
     })
 
-router.get("/:id",authMiddleware,async(req,res)=>{
+router.get("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id}=req.params;
         const bookedListings= await booking.findById(id);
@@ -50,8 +49,7 @@ router.get("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Here is your booking !",listing:bookedListings});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"There is no booking !"});
+        next(error);
     } 
 });
 

@@ -9,7 +9,7 @@ const {body,validationResult}= require("express-validator");
 router.post('/login',[
     body('email').notEmpty().isEmail().withMessage('Invaild email'),
     body('password').notEmpty().isStrongPassword().withMessage('the password should be of min 8 chars with one Uppercase and Lowercase letter'),
-],async (req,res)=>{
+],async (req,res,next)=>{
     const errors=validationResult(req);
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()});
@@ -32,8 +32,7 @@ router.post('/login',[
         }
         }
     }catch(error){
-        console.log(error);
-        res.status(500).json({msg:"Internal Error"});
+       next(error);
     }
 })
 
@@ -41,7 +40,7 @@ router.post('/signup',[
     body('email').notEmpty().isEmail().withMessage('Invaild email'),
     body('password').notEmpty().isStrongPassword().withMessage('the password should be of min 8 chars with one Uppercase and Lowercase letter'),
     body('name').notEmpty().isAlpha().withMessage("The name should not contain any number or symbols"),
-],async (req,res)=>{
+],async (req,res,next)=>{
     const errors=validationResult(req);
     if(!errors.isEmpty()){
        return res.status(400).json({errors:errors.array()});
@@ -59,12 +58,7 @@ router.post('/signup',[
         await userr.save();
         res.status(200).json({msg:"you have succesfully destructured and stored the data "})
     }catch(error){
-        console.log(error)
-        if(error.name==="ValidationError"){
-            res.status(400).json({error:"There is some issue please enter all the details correctly!"})
-        }else{
-            res.status(500).json({error:"Internal Server"})
-        }
+        next(error)
     }
 })
 

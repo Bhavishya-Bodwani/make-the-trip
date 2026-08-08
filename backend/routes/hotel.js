@@ -3,7 +3,7 @@ const hotel=require("../models/hotel");
 const router=express.Router();
 const authMiddleware=require("../middleware/auth");
 
-router.post("/",authMiddleware,async(req,res)=>{
+router.post("/",authMiddleware,async(req,res,next)=>{
     try{
         const {name,location,price,amenities,images,rating}=req.body;  //the code is destructured here 
 
@@ -19,12 +19,11 @@ router.post("/",authMiddleware,async(req,res)=>{
         await listings.save();
         res.status(201).json({message:"The data has been successfully destructured and stored",data:listings})
     }catch(error){
-        res.status(400).json({message:"There is an internal server error! while storing the data"})
-        console.log("error ",error)
+       next(error)
     }
 });
 
-router.get("/",async(req,res)=>{
+router.get("/",async(req,res,next)=>{
     try{
         const {locationSearched}=req.query;
         const {minPrice,maxPrice}=req.query;
@@ -42,12 +41,11 @@ router.get("/",async(req,res)=>{
 
         res.status(200).json({message:"user can see the listings available in Db",list:returnSearch});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"Can not find the listing !"});
+        next(error);
     }
 })
 
-router.get("/:id",async(req,res)=>{
+router.get("/:id",async(req,res,next)=>{
     try{
         const {id}=req.params;
         const collection = await hotel.findById(id);
@@ -57,12 +55,11 @@ router.get("/:id",async(req,res)=>{
         }
         res.status(200).json({message:"listing is fetched !",list:collection})
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"can not find the listing!"});
+       next(error);
     }
 })
 
-router.put("/:id",authMiddleware,async(req,res)=>{
+router.put("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id}=req.params;
         const {name,location,price,amenities,images,rating}=req.body;
@@ -73,12 +70,11 @@ router.put("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"Listing has been updated successfully",list:collection});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"Cannot modify the listing details !"});
+        next(error)
     }
 })
 
-router.delete("/:id",authMiddleware,async(req,res)=>{
+router.delete("/:id",authMiddleware,async(req,res,next)=>{
     try{
         const {id}=req.params;
         const deleted= await hotel.findByIdAndDelete(id);
@@ -88,8 +84,7 @@ router.delete("/:id",authMiddleware,async(req,res)=>{
         }
         res.status(200).json({message:"The Listing has been deleted successfully",list:deleted});
     }catch(error){
-        console.log(error);
-        res.status(500).json({message:"Cannot delete the listing"});
+        next(error);
     }
 })
 module.exports=router;
